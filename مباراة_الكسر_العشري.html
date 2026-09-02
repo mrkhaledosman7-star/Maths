@@ -1,0 +1,697 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>مباراة الكسر العشري</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@600;800&family=Almarai:wght@400;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg-0:#FFFDF7;
+    --panel:#FFFFFF;
+    --panel-2:#F1F5F9;
+    --line:rgba(15,23,42,.10);
+    --text:#1E293B;
+    --muted:#64748B;
+    --p1:#F59E0B;
+    --p1-dark:#B45309;
+    --p1-glow:rgba(245,158,11,.35);
+    --p2:#0D9488;
+    --p2-dark:#0F766E;
+    --p2-glow:rgba(13,148,136,.35);
+    --good:#16A34A;
+    --bad:#DC2626;
+    --gold:#CA8A04;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;height:100%;}
+  body{
+    font-family:'Almarai','Cairo',sans-serif;
+    background:
+      radial-gradient(1000px 520px at 12% -10%, rgba(253,230,138,.6) 0%, transparent 55%),
+      radial-gradient(900px 520px at 100% 0%, rgba(167,243,208,.55) 0%, transparent 50%),
+      radial-gradient(900px 520px at 50% 115%, rgba(191,219,254,.55) 0%, transparent 55%),
+      linear-gradient(180deg, var(--bg-0) 0%, #FFFFFF 100%);
+    color:var(--text);
+    height:100vh;
+    width:100vw;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    padding:1.4vh 1.4vw;
+    direction:rtl;
+    overflow:hidden;
+  }
+  .wrap{width:100%;max-width:760px;height:100%;max-height:97vh;margin:0 auto;position:relative;display:flex;flex-direction:column;}
+  .top-row{display:flex;align-items:center;justify-content:center;gap:10px;position:relative;flex:0 0 auto;}
+  h1{font-family:'Cairo',sans-serif;font-weight:800;text-align:center;font-size:clamp(14px,2vh,21px);margin:0.4vh 0 0.1vh;letter-spacing:0.5px;}
+  .sub{text-align:center;color:var(--muted);font-size:clamp(9.5px,1.2vh,12.5px);margin:0 0 1vh;flex:0 0 auto;}
+  .mute-btn{
+    position:absolute;left:0;top:0;width:34px;height:34px;border-radius:50%;
+    background:var(--panel-2);border:1px solid var(--line);color:var(--text);
+    font-size:15px;cursor:pointer;display:flex;align-items:center;justify-content:center;
+  }
+  .card{
+    background:var(--panel);
+    border:1px solid var(--line);
+    border-radius:20px;
+    padding:clamp(10px,2vh,20px) clamp(12px,2vw,20px);
+    position:relative;
+    overflow:hidden;
+    flex:1 1 auto;
+    display:flex;
+    flex-direction:column;
+    justify-content:center;
+    min-height:0;
+    box-shadow:0 10px 30px rgba(15,23,42,.08);
+  }
+  .stars{position:absolute;inset:0;pointer-events:none;opacity:.5;
+    background-image:
+      radial-gradient(2.5px 2.5px at 20px 30px, #FCD34D 100%, transparent),
+      radial-gradient(2px 2px at 90px 80px, #5EEAD4 100%, transparent),
+      radial-gradient(2.5px 2.5px at 170px 40px, #F9A8D4 100%, transparent),
+      radial-gradient(2px 2px at 250px 110px, #93C5FD 100%, transparent),
+      radial-gradient(2.5px 2.5px at 320px 20px, #FCD34D 100%, transparent);
+    background-repeat:repeat;background-size:360px 160px;
+  }
+
+  #startScreen{display:flex;flex-direction:column;justify-content:center;gap:clamp(8px,1.6vh,16px);}
+  #startScreen .field{margin-bottom:0;}
+  #startScreen label{display:block;font-size:clamp(11px,1.3vh,14px);color:var(--muted);margin-bottom:clamp(5px,0.9vh,8px);font-weight:700;}
+  .name-row{display:flex;gap:12px;}
+  .name-box{flex:1;position:relative;}
+  .name-box input{
+    width:100%;padding:clamp(8px,1.4vh,12px) 14px;border-radius:14px;border:2px solid var(--line);
+    background:var(--panel-2);color:var(--text);font-family:inherit;font-size:clamp(13px,1.6vh,15px);font-weight:700;
+    outline:none;transition:border-color .15s;
+  }
+  .name-box.p1 input{border-color:var(--p1-dark);}
+  .name-box.p1 input:focus{border-color:var(--p1);}
+  .name-box.p2 input{border-color:var(--p2-dark);}
+  .name-box.p2 input:focus{border-color:var(--p2);}
+  .name-box .dot{position:absolute;right:14px;top:-9px;font-size:11px;font-weight:800;padding:2px 8px;border-radius:10px;}
+  .name-box.p1 .dot{background:var(--p1);color:#3a2400;}
+  .name-box.p2 .dot{background:var(--p2);color:#00332e;}
+  .err{color:var(--bad);font-size:12px;margin-top:6px;display:none;font-weight:700;}
+  .range-row{display:flex;align-items:center;gap:10px;background:var(--panel-2);border-radius:14px;padding:clamp(8px,1.4vh,12px) 16px;color:var(--muted);font-size:clamp(11px,1.3vh,13px);line-height:1.5;}
+  .legend{display:flex;gap:8px;flex-wrap:wrap;}
+  .legend span{background:var(--panel-2);border:1px solid var(--line);border-radius:10px;padding:4px 10px;font-size:clamp(10px,1.15vh,12px);color:var(--text);font-weight:700;}
+  .big-btn{
+    width:100%;padding:clamp(10px,1.9vh,16px);border:none;border-radius:16px;
+    background:linear-gradient(180deg,#3B4BD8,#2C39B0);
+    color:#fff;font-family:'Cairo',sans-serif;font-weight:800;font-size:clamp(14px,1.9vh,18px);cursor:pointer;
+    box-shadow:0 6px 0 #1c2680, 0 8px 16px rgba(0,0,0,.35);
+    transition:transform .08s;
+  }
+  .big-btn:active{transform:translateY(5px);box-shadow:0 1px 0 #1c2680;}
+
+  #gameScreen, #resultScreen{display:none;flex-direction:column;justify-content:center;gap:clamp(4px,1vh,10px);min-height:0;}
+  .hud{display:flex;justify-content:space-between;gap:10px;flex:0 0 auto;}
+  .hud-card{flex:1;background:var(--panel-2);border-radius:14px;padding:clamp(6px,1.2vh,10px) 12px;border:2px solid transparent;transition:.2s;}
+  .hud-card.active{transform:translateY(-2px);}
+  .hud-card.p1.active{border-color:var(--p1);box-shadow:0 0 0 3px var(--p1-glow);}
+  .hud-card.p2.active{border-color:var(--p2);box-shadow:0 0 0 3px var(--p2-glow);}
+  .hud-name{font-size:clamp(11px,1.3vh,13px);font-weight:800;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .hud-card.p1 .hud-name{color:var(--p1);}
+  .hud-card.p2 .hud-name{color:var(--p2);}
+  .hud-score{font-family:'Cairo',sans-serif;font-size:clamp(17px,2.2vh,23px);font-weight:800;}
+  .hud-max{font-size:11px;color:var(--muted);font-weight:700;}
+  .track{height:6px;border-radius:6px;background:rgba(15,23,42,.08);margin-top:6px;overflow:hidden;}
+  .track-fill{height:100%;border-radius:6px;width:0%;transition:width .5s ease;}
+  .p1 .track-fill{background:linear-gradient(90deg,#c77c0f,var(--p1));}
+  .p2 .track-fill{background:linear-gradient(90deg,#128d80,var(--p2));}
+
+  .turn-banner{
+    text-align:center;font-family:'Cairo',sans-serif;font-weight:800;font-size:clamp(12px,1.5vh,14.5px);
+    padding:clamp(5px,1vh,8px);border-radius:12px;letter-spacing:.3px;flex:0 0 auto;
+  }
+  .turn-banner.p1{background:rgba(245,166,35,.15);color:var(--p1);}
+  .turn-banner.p2{background:rgba(45,212,191,.15);color:var(--p2);}
+
+  .q-progress{display:flex;justify-content:center;gap:4px;flex-wrap:wrap;max-width:460px;margin:0 auto;flex:0 0 auto;}
+  .q-dot{width:8px;height:8px;border-radius:50%;background:rgba(15,23,42,.15);}
+  .q-dot.done.p1c{background:var(--p1);}
+  .q-dot.done.p2c{background:var(--p2);}
+  .q-dot.now{outline:2px solid #fff;outline-offset:2px;}
+
+  .question-zone{position:relative;text-align:center;flex:1 1 auto;display:flex;flex-direction:column;justify-content:center;min-height:0;}
+  .timer-ring{width:clamp(46px,6.2vh,60px);height:clamp(46px,6.2vh,60px);margin:0 auto clamp(2px,0.6vh,6px);position:relative;}
+  .timer-ring svg{transform:rotate(-90deg);width:100%;height:100%;}
+  .timer-ring circle{fill:none;stroke-width:7;}
+  .timer-bg{stroke:rgba(15,23,42,.10);}
+  .timer-fg{stroke:var(--good);stroke-linecap:round;transition:stroke-dashoffset 1s linear, stroke .3s;}
+  .timer-num{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-family:'Cairo',sans-serif;font-weight:800;font-size:clamp(14px,2vh,18px);color:var(--text);}
+
+  .cat-badge{display:inline-block;background:var(--panel-2);border:1px solid var(--line);color:var(--gold);font-weight:800;font-size:clamp(9.5px,1.1vh,11.5px);padding:3px 11px;border-radius:20px;margin-bottom:clamp(3px,0.8vh,6px);}
+  .q-label{color:var(--muted);font-weight:800;font-size:clamp(11px,1.35vh,13.5px);margin-bottom:clamp(2px,0.5vh,4px);}
+  .given-box{background:var(--panel-2);border:1px solid var(--line);border-radius:14px;padding:clamp(8px,1.8vh,16px) clamp(10px,2vw,16px);margin:clamp(4px,1vh,8px) auto clamp(8px,1.6vh,14px);max-width:440px;}
+  .given-label{color:var(--muted);font-size:clamp(9.5px,1.1vh,11.5px);font-weight:700;margin-bottom:4px;}
+  .given-text{font-family:'Cairo',sans-serif;font-weight:800;font-size:clamp(24px,4.4vh,40px);direction:ltr;unicode-bidi:isolate;}
+  .frac{display:inline-flex;flex-direction:column;align-items:center;line-height:1.15;vertical-align:middle;margin:0 3px;}
+  .frac .num{display:block;padding:0 6px 3px;border-bottom:3px solid currentColor;}
+  .frac .den{display:block;padding:3px 6px 0;}
+
+  .answers{display:grid;grid-template-columns:1fr 1fr;gap:clamp(7px,1.2vh,12px);max-width:420px;margin:0 auto;width:100%;}
+  .ans-btn{
+    padding:clamp(8px,1.6vh,14px) 10px;border-radius:14px;border:2px solid var(--line);
+    background:var(--panel-2);color:var(--text);font-family:'Cairo',sans-serif;font-weight:800;font-size:clamp(15px,2.2vh,20px);
+    cursor:pointer;transition:transform .08s, border-color .15s, background .15s;
+    display:flex;align-items:center;justify-content:center;gap:8px;
+  }
+  .ans-btn .opt-content{direction:ltr;unicode-bidi:isolate;}
+  .ans-btn:hover{border-color:rgba(15,23,42,.25);}
+  .opt-label{color:var(--muted);font-weight:800;flex:0 0 auto;}
+  .opt-content{display:inline-flex;align-items:center;justify-content:center;}
+  .ans-btn:active{transform:scale(.97);}
+  .ans-btn.correct{background:rgba(74,222,128,.18);border-color:var(--good);color:var(--good);}
+  .ans-btn.wrong{background:rgba(248,113,113,.18);border-color:var(--bad);color:var(--bad);}
+  .ans-btn.disabled{pointer-events:none;opacity:.55;}
+
+  .feedback{min-height:clamp(22px,3.3vh,36px);text-align:center;font-weight:800;font-family:'Cairo',sans-serif;font-size:clamp(12px,1.5vh,14.5px);margin-top:clamp(5px,1.1vh,10px);flex:0 0 auto;}
+  .feedback .pts{display:block;font-size:clamp(10.5px,1.25vh,12px);margin-top:3px;font-weight:700;}
+  .feedback.good{color:var(--good);}
+  .feedback.bad{color:var(--bad);}
+
+  #resultScreen{text-align:center;align-items:center;}
+  .trophy{font-size:clamp(36px,5.6vh,52px);margin-bottom:2px;}
+  .winner-name{font-family:'Cairo',sans-serif;font-size:clamp(16px,2.2vh,21px);font-weight:800;margin:2px 0 2px;}
+  .winner-cheer{color:var(--gold);font-weight:800;font-size:clamp(11.5px,1.45vh,14px);margin-bottom:clamp(8px,1.7vh,16px);}
+  .result-row{display:flex;gap:12px;margin-bottom:clamp(8px,1.5vh,14px);width:100%;max-width:460px;}
+  .result-card{flex:1;border-radius:16px;padding:clamp(9px,1.9vh,15px) 10px;background:var(--panel-2);border:2px solid transparent;position:relative;overflow:hidden;}
+  .result-card.win{box-shadow:0 0 0 3px currentColor inset;}
+  .result-card.p1{color:var(--p1);}
+  .result-card.p2{color:var(--p2);}
+  .result-card .rn{font-size:12px;font-weight:800;color:var(--muted);margin-bottom:4px;}
+  .result-card .rs{font-family:'Cairo',sans-serif;font-size:clamp(21px,3vh,27px);font-weight:800;color:var(--text);}
+  .medal{position:absolute;top:8px;left:10px;font-size:16px;}
+
+  .confetti-wrap{position:relative;height:0;}
+  .confetti{position:absolute;top:-10px;font-size:18px;opacity:0;animation:fall 2.6s ease-in forwards;}
+  @keyframes fall{
+    0%{transform:translateY(0) rotate(0deg);opacity:1;}
+    100%{transform:translateY(200px) rotate(360deg);opacity:0;}
+  }
+
+  .num-tip{
+    text-align:center;color:var(--muted);font-size:clamp(9px,1vh,11px);margin-top:clamp(5px,1.1vh,10px);line-height:1.6;flex:0 0 auto;
+  }
+  .num-tip b{color:var(--text);}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="top-row">
+    <button class="mute-btn" id="muteBtn" title="كتم الصوت">🔊</button>
+    <h1>➗ مباراة الكسر العشري</h1>
+  </div>
+  <p class="sub">حوّل بين الكسر الاعتيادي (مقامه ١٠ أو ١٠٠ أو ١٠٠٠) وصورته العشرية — ٣٠ ثانية لكل سؤال، والتقييم على صحة الإجابة!</p>
+
+  <div class="card">
+    <div class="stars"></div>
+
+    <div id="startScreen">
+      <div class="field">
+        <label>أسماء اللاعبين</label>
+        <div class="name-row">
+          <div class="name-box p1">
+            <span class="dot">اللاعب ١</span>
+            <input id="p1Name" type="text" value="اللاعب الأول" placeholder="اكتب اسم اللاعب الأول" maxlength="16">
+          </div>
+          <div class="name-box p2">
+            <span class="dot">اللاعب ٢</span>
+            <input id="p2Name" type="text" value="اللاعب الثاني" placeholder="اكتب اسم اللاعب الثاني" maxlength="16">
+          </div>
+        </div>
+        <div class="err" id="nameErr">اكتب اسم كل لاعب قبل البدء</div>
+      </div>
+      <div class="range-row">
+        <span>📊</span>
+        <div>
+          <div style="margin-bottom:6px;">تبادل سؤالًا سؤالًا — كل لاعب يحوّل ٥ كسور بين الصورة الاعتيادية والصورة العشرية، ولكل سؤال مهلة ٣٠ ثانية. كل إجابة صحيحة تدّي ٢٠ نقطة كاملة بغض النظر عن السرعة، والمجموع من ١٠٠.</div>
+          <div class="legend">
+            <span>مقام ١٠</span><span>مقام ١٠٠</span><span>مقام ١٠٠٠</span>
+          </div>
+        </div>
+      </div>
+      <button class="big-btn" id="startBtn">ابدأ المباراة 🚀</button>
+    </div>
+
+    <div id="gameScreen">
+      <div class="hud">
+        <div class="hud-card p1" id="hudP1">
+          <div class="hud-name" id="hudP1Name">اللاعب ١</div>
+          <div class="hud-score" id="hudP1Score">٠ <span class="hud-max">/١٠٠</span></div>
+          <div class="track"><div class="track-fill" id="hudP1Fill"></div></div>
+        </div>
+        <div class="hud-card p2" id="hudP2">
+          <div class="hud-name" id="hudP2Name">اللاعب ٢</div>
+          <div class="hud-score" id="hudP2Score">٠ <span class="hud-max">/١٠٠</span></div>
+          <div class="track"><div class="track-fill" id="hudP2Fill"></div></div>
+        </div>
+      </div>
+
+      <div class="turn-banner" id="turnBanner">دور اللاعب ١</div>
+      <div class="q-progress" id="qProgress"></div>
+
+      <div class="question-zone">
+        <div class="timer-ring">
+          <svg viewBox="0 0 78 78">
+            <circle class="timer-bg" cx="39" cy="39" r="34"></circle>
+            <circle class="timer-fg" id="timerFg" cx="39" cy="39" r="34" stroke-dasharray="213.6" stroke-dashoffset="0"></circle>
+          </svg>
+          <div class="timer-num" id="timerNum">٣٠</div>
+        </div>
+        <div class="cat-badge" id="catBadge">مقام ١٠</div>
+        <div class="q-label" id="qLabel">اختر الصورة الصحيحة</div>
+        <div class="given-box">
+          <div class="given-label" id="givenLabel">الكسر الاعتيادي</div>
+          <div class="given-text" id="givenText">؟</div>
+        </div>
+        <div class="answers" id="answers"></div>
+        <div class="feedback" id="feedback">&nbsp;</div>
+      </div>
+    </div>
+
+    <div id="resultScreen">
+      <div class="confetti-wrap" id="confettiWrap"></div>
+      <div class="trophy" id="trophyEmoji">🏆</div>
+      <div class="winner-name" id="winnerName">النتيجة</div>
+      <div class="winner-cheer" id="winnerCheer"></div>
+      <div class="result-row">
+        <div class="result-card p1" id="rCardP1">
+          <div class="medal" id="medalP1"></div>
+          <div class="rn" id="rNameP1">اللاعب ١</div>
+          <div class="rs" id="rScoreP1">٠/١٠٠</div>
+        </div>
+        <div class="result-card p2" id="rCardP2">
+          <div class="medal" id="medalP2"></div>
+          <div class="rn" id="rNameP2">اللاعب ٢</div>
+          <div class="rs" id="rScoreP2">٠/١٠٠</div>
+        </div>
+      </div>
+      <button class="big-btn" id="playAgainBtn">مباراة جديدة بأعداد مختلفة 🔄</button>
+    </div>
+
+    <p class="num-tip">💡 تلميح: عدد الأصفار في المقام (١٠، ١٠٠، ١٠٠٠) يساوي عدد المنازل العشرية بعد الفاصلة في الصورة العشرية.</p>
+  </div>
+</div>
+
+<script>
+const hindiDigits = ['٠','١','٢','٣','٤','٥','٦','٧','٨','٩'];
+function toHindi(n){
+  return String(n).split('').map(ch => /[0-9]/.test(ch) ? hindiDigits[ch] : ch).join('');
+}
+
+const QUESTIONS_PER_PLAYER = 5;
+const TOTAL_QUESTIONS = QUESTIONS_PER_PLAYER * 2;
+const TIME_PER_Q = 30;
+const MAX_SCORE = 100;
+const POINTS_PER_CORRECT = 20;
+
+const CHEERS = ['أحسنت! 👏','رائع! 🎯','ممتاز! ⭐','عمل رائع! 🌟','تحويل صحيح! 💡'];
+
+const CAT_LABELS = { 1:'مقام ١٠', 2:'مقام ١٠٠', 3:'مقام ١٠٠٠' };
+const FORM_LABELS = { fraction:'الكسر الاعتيادي', decimal:'الصورة العشرية' };
+
+let state = null;
+let timerInterval = null;
+let soundOn = true;
+let audioCtx = null;
+
+function getAudioCtx(){
+  if(!audioCtx){
+    audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+  }
+  return audioCtx;
+}
+function tone(freq, start, dur, type, vol){
+  if(!soundOn) return;
+  const ctx = getAudioCtx();
+  const osc = ctx.createOscillator();
+  const gain = ctx.createGain();
+  osc.type = type || 'sine';
+  osc.frequency.value = freq;
+  gain.gain.setValueAtTime(0, ctx.currentTime + start);
+  gain.gain.linearRampToValueAtTime(vol || 0.18, ctx.currentTime + start + 0.02);
+  gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + start + dur);
+  osc.connect(gain);
+  gain.connect(ctx.destination);
+  osc.start(ctx.currentTime + start);
+  osc.stop(ctx.currentTime + start + dur + 0.02);
+}
+function playCorrect(){
+  tone(660, 0, 0.12, 'triangle', 0.16);
+  tone(880, 0.1, 0.16, 'triangle', 0.18);
+  tone(1175, 0.22, 0.2, 'triangle', 0.15);
+}
+function playWrong(){
+  tone(300, 0, 0.18, 'sine', 0.1);
+  tone(220, 0.12, 0.22, 'sine', 0.08);
+}
+function playFanfare(){
+  const notes = [523,659,784,1046,1318];
+  notes.forEach((f,i) => tone(f, i*0.16, 0.3, 'triangle', 0.17));
+  tone(1568, 0.9, 0.5, 'triangle', 0.18);
+}
+
+function shuffle(arr){
+  const a = arr.slice();
+  for(let i=a.length-1;i>0;i--){
+    const j = Math.floor(Math.random()*(i+1));
+    [a[i],a[j]] = [a[j],a[i]];
+  }
+  return a;
+}
+function randInt(min, max){
+  return Math.floor(Math.random()*(max-min+1)) + min;
+}
+
+/* ---------- Fraction <-> decimal renderers ---------- */
+function renderFraction(numerator, p){
+  const denomStr = '1' + '0'.repeat(p);
+  return '<span class="frac"><span class="num">' + toHindi(numerator) + '</span><span class="den">' + toHindi(denomStr) + '</span></span>';
+}
+function renderDecimal(numerator, p){
+  const numStr = String(numerator).padStart(p, '0');
+  return toHindi('0.' + numStr).replace('.', '٫');
+}
+function renderForm(form, numerator, p){
+  return form === 'fraction' ? renderFraction(numerator, p) : renderDecimal(numerator, p);
+}
+
+/* ---------- Question generation ---------- */
+function genBase(){
+  const p = randInt(1,3);
+  const digit = randInt(1,9);
+  return { p, digit };
+}
+
+function buildQuestion(usedKeys){
+  let base, key, guard = 0;
+  do {
+    base = genBase();
+    key = base.p + '-' + base.digit;
+    guard++;
+  } while(usedKeys.has(key) && guard < 40);
+  usedKeys.add(key);
+
+  const { p, digit } = base;
+  const forms = ['fraction','decimal'];
+  const given = forms[randInt(0,1)];
+  const target = given === 'fraction' ? 'decimal' : 'fraction';
+
+  const correctStr = renderForm(target, digit, p);
+  const optSet = new Set([correctStr]);
+  const options = [correctStr];
+
+  /* Distractors 1 & 2: exact same digit, but a different place value
+     (tenths/hundredths/thousandths) — tests precise place-value understanding */
+  const otherPs = [1,2,3].filter(pp => pp !== p);
+  otherPs.forEach(pp => {
+    const s = renderForm(target, digit, pp);
+    if(!optSet.has(s)){
+      optSet.add(s);
+      options.push(s);
+    }
+  });
+
+  /* Distractor 3: a different digit, at a random place value */
+  let altDigit, g = 0;
+  do { altDigit = randInt(1,9); g++; } while(altDigit === digit && g < 15);
+  const altP = [1,2,3][randInt(0,2)];
+  let s4 = renderForm(target, altDigit, altP);
+  let g2 = 0;
+  while(optSet.has(s4) && g2 < 20){
+    altDigit = randInt(1,9);
+    s4 = renderForm(target, altDigit, altP);
+    g2++;
+  }
+  optSet.add(s4);
+  options.push(s4);
+
+  let fillGuard = 0;
+  while(options.length < 4 && fillGuard < 30){
+    fillGuard++;
+    const n = randInt(1,9);
+    const pp = [1,2,3][randInt(0,2)];
+    const s = renderForm(target, n, pp);
+    if(!optSet.has(s)){
+      optSet.add(s);
+      options.push(s);
+    }
+  }
+
+  return {
+    p, given, target,
+    givenText: renderForm(given, digit, p),
+    correctStr,
+    options: shuffle(options.slice(0,4))
+  };
+}
+
+function buildQuestionPool(){
+  const usedKeys = new Set();
+  const pool = [];
+  for(let i=0;i<TOTAL_QUESTIONS;i++){
+    pool.push(buildQuestion(usedKeys));
+  }
+  return pool;
+}
+
+/* ---------- Game flow ---------- */
+document.getElementById('muteBtn').addEventListener('click', () => {
+  soundOn = !soundOn;
+  document.getElementById('muteBtn').textContent = soundOn ? '🔊' : '🔇';
+});
+
+function startGame(){
+  const p1 = document.getElementById('p1Name').value.trim() || 'اللاعب ١';
+  const p2 = document.getElementById('p2Name').value.trim() || 'اللاعب ٢';
+  if(!document.getElementById('p1Name').value.trim() || !document.getElementById('p2Name').value.trim()){
+    document.getElementById('nameErr').style.display = 'block';
+    return;
+  }
+  document.getElementById('nameErr').style.display = 'none';
+  getAudioCtx();
+
+  state = {
+    names: [p1, p2],
+    scores: [0,0],
+    answered: [0,0],
+    questions: buildQuestionPool(),
+    qIndex: 0
+  };
+
+  document.getElementById('hudP1Name').textContent = p1;
+  document.getElementById('hudP2Name').textContent = p2;
+  updateHud();
+
+  document.getElementById('startScreen').style.display = 'none';
+  document.getElementById('resultScreen').style.display = 'none';
+  document.getElementById('gameScreen').style.display = 'flex';
+
+  buildProgressDots();
+  showQuestion();
+}
+
+function buildProgressDots(){
+  const el = document.getElementById('qProgress');
+  el.innerHTML = '';
+  for(let i=0;i<TOTAL_QUESTIONS;i++){
+    const d = document.createElement('div');
+    d.className = 'q-dot';
+    d.id = 'dot-'+i;
+    el.appendChild(d);
+  }
+}
+
+function currentPlayer(){ return state.qIndex % 2; }
+
+function showQuestion(){
+  clearInterval(timerInterval);
+  if(state.qIndex >= TOTAL_QUESTIONS){
+    endGame();
+    return;
+  }
+  const player = currentPlayer();
+  const q = state.questions[state.qIndex];
+  const qNumForPlayer = state.answered[player] + 1;
+
+  document.getElementById('hudP1').classList.toggle('active', player === 0);
+  document.getElementById('hudP2').classList.toggle('active', player === 1);
+
+  const banner = document.getElementById('turnBanner');
+  banner.textContent = 'دور ' + state.names[player] + ' — سؤال ' + toHindi(qNumForPlayer) + ' من ' + toHindi(QUESTIONS_PER_PLAYER);
+  banner.className = 'turn-banner ' + (player === 0 ? 'p1' : 'p2');
+
+  for(let i=0;i<TOTAL_QUESTIONS;i++){
+    const dot = document.getElementById('dot-'+i);
+    dot.className = 'q-dot';
+    if(i < state.qIndex) dot.classList.add('done', i % 2 === 0 ? 'p1c' : 'p2c');
+    if(i === state.qIndex) dot.classList.add('now');
+  }
+
+  document.getElementById('catBadge').textContent = CAT_LABELS[q.p];
+  document.getElementById('qLabel').textContent = 'اختر ' + FORM_LABELS[q.target] + ' الصحيحة لهذا الكسر';
+  document.getElementById('givenLabel').textContent = FORM_LABELS[q.given];
+  document.getElementById('givenText').innerHTML = q.givenText;
+
+  const LETTERS = ['أ','ب','ج','د'];
+  const answersEl = document.getElementById('answers');
+  answersEl.innerHTML = '';
+  q.options.forEach((opt, idx) => {
+    const btn = document.createElement('button');
+    btn.className = 'ans-btn';
+    btn.innerHTML = '<span class="opt-label">' + LETTERS[idx] + '.</span><span class="opt-content">' + opt + '</span>';
+    btn.dataset.val = opt;
+    btn.addEventListener('click', () => handleAnswer(opt, btn));
+    answersEl.appendChild(btn);
+  });
+
+  document.getElementById('feedback').innerHTML = '&nbsp;';
+  document.getElementById('feedback').className = 'feedback';
+
+  startTimer();
+}
+
+function startTimer(){
+  let remaining = TIME_PER_Q;
+  const circumference = 213.6;
+  const fg = document.getElementById('timerFg');
+  const numEl = document.getElementById('timerNum');
+  fg.style.stroke = 'var(--good)';
+  fg.style.strokeDashoffset = '0';
+  numEl.textContent = toHindi(remaining);
+
+  timerInterval = setInterval(() => {
+    remaining -= 1;
+    const ratio = Math.max(remaining,0) / TIME_PER_Q;
+    fg.style.strokeDashoffset = String(circumference * (1-ratio));
+    numEl.textContent = toHindi(Math.max(remaining,0));
+    if(remaining <= 8){
+      fg.style.stroke = 'var(--bad)';
+    }
+    if(remaining <= 0){
+      clearInterval(timerInterval);
+      handleAnswer(null, null);
+    }
+  }, 1000);
+}
+
+function handleAnswer(chosen, btnEl){
+  clearInterval(timerInterval);
+  const player = currentPlayer();
+  const q = state.questions[state.qIndex];
+  const isCorrect = chosen === q.correctStr;
+
+  const buttons = document.querySelectorAll('.ans-btn');
+  buttons.forEach(b => {
+    b.classList.add('disabled');
+    if(b.dataset.val === q.correctStr) b.classList.add('correct');
+  });
+  if(btnEl && !isCorrect) btnEl.classList.add('wrong');
+
+  const fb = document.getElementById('feedback');
+  let points = 0;
+  if(isCorrect){
+    points = POINTS_PER_CORRECT;
+    state.scores[player] += points;
+    playCorrect();
+    const cheer = CHEERS[Math.floor(Math.random()*CHEERS.length)];
+    fb.innerHTML = cheer + '<span class="pts">+' + toHindi(points) + ' نقاط</span>';
+    fb.className = 'feedback good';
+  } else if(chosen === null){
+    playWrong();
+    fb.innerHTML = 'انتهى الوقت! الصحيح: ' + q.correctStr + '<span class="pts">+٠ نقاط</span>';
+    fb.className = 'feedback bad';
+  } else {
+    playWrong();
+    fb.innerHTML = 'إجابة خاطئة، الصحيح: ' + q.correctStr + '<span class="pts">+٠ نقاط</span>';
+    fb.className = 'feedback bad';
+  }
+
+  state.answered[player] += 1;
+  updateHud();
+
+  setTimeout(() => {
+    state.qIndex += 1;
+    showQuestion();
+  }, 1600);
+}
+
+function updateHud(){
+  document.getElementById('hudP1Score').innerHTML = toHindi(state.scores[0]) + ' <span class="hud-max">/١٠٠</span>';
+  document.getElementById('hudP2Score').innerHTML = toHindi(state.scores[1]) + ' <span class="hud-max">/١٠٠</span>';
+  document.getElementById('hudP1Fill').style.width = (state.scores[0]/MAX_SCORE*100) + '%';
+  document.getElementById('hudP2Fill').style.width = (state.scores[1]/MAX_SCORE*100) + '%';
+}
+
+function spawnConfetti(){
+  const wrap = document.getElementById('confettiWrap');
+  wrap.innerHTML = '';
+  const emojis = ['🎉','⭐','🎊','✨','🏅'];
+  for(let i=0;i<18;i++){
+    const s = document.createElement('span');
+    s.className = 'confetti';
+    s.textContent = emojis[Math.floor(Math.random()*emojis.length)];
+    s.style.left = (Math.random()*94)+'%';
+    s.style.animationDelay = (Math.random()*0.6)+'s';
+    s.style.fontSize = (14+Math.random()*14)+'px';
+    wrap.appendChild(s);
+  }
+}
+
+function endGame(){
+  document.getElementById('gameScreen').style.display = 'none';
+  document.getElementById('resultScreen').style.display = 'flex';
+
+  document.getElementById('rNameP1').textContent = state.names[0];
+  document.getElementById('rNameP2').textContent = state.names[1];
+  document.getElementById('rScoreP1').textContent = toHindi(state.scores[0]) + '/' + toHindi(MAX_SCORE);
+  document.getElementById('rScoreP2').textContent = toHindi(state.scores[1]) + '/' + toHindi(MAX_SCORE);
+
+  const cardP1 = document.getElementById('rCardP1');
+  const cardP2 = document.getElementById('rCardP2');
+  cardP1.classList.remove('win');
+  cardP2.classList.remove('win');
+  document.getElementById('medalP1').textContent = '';
+  document.getElementById('medalP2').textContent = '';
+
+  const winnerEl = document.getElementById('winnerName');
+  const cheerEl = document.getElementById('winnerCheer');
+  const trophyEl = document.getElementById('trophyEmoji');
+
+  if(state.scores[0] > state.scores[1]){
+    winnerEl.textContent = '🎉 مبروك يا ' + state.names[0] + '! أنت بطل الكسر العشري 🎉';
+    cheerEl.textContent = 'نجم النقاط بـ ' + toHindi(state.scores[0]) + ' من ١٠٠ — تحويل دقيق ورائع!';
+    cardP1.classList.add('win');
+    document.getElementById('medalP1').textContent = '🥇';
+    document.getElementById('medalP2').textContent = '🥈';
+    trophyEl.textContent = '🏆';
+  } else if(state.scores[1] > state.scores[0]){
+    winnerEl.textContent = '🎉 مبروك يا ' + state.names[1] + '! أنت بطل الكسر العشري 🎉';
+    cheerEl.textContent = 'نجم النقاط بـ ' + toHindi(state.scores[1]) + ' من ١٠٠ — تحويل دقيق ورائع!';
+    cardP2.classList.add('win');
+    document.getElementById('medalP2').textContent = '🥇';
+    document.getElementById('medalP1').textContent = '🥈';
+    trophyEl.textContent = '🏆';
+  } else {
+    winnerEl.textContent = 'تعادل رائع بين البطلين! 🤝';
+    cheerEl.textContent = 'الاثنان جمعوا ' + toHindi(state.scores[0]) + ' من ١٠٠ — أداء متميز!';
+    trophyEl.textContent = '🤝';
+  }
+
+  spawnConfetti();
+  playFanfare();
+}
+
+document.getElementById('startBtn').addEventListener('click', startGame);
+document.getElementById('playAgainBtn').addEventListener('click', () => {
+  document.getElementById('resultScreen').style.display = 'none';
+  document.getElementById('startScreen').style.display = 'flex';
+});
+</script>
+</body>
+</html>
